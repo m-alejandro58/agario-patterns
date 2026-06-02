@@ -12,24 +12,17 @@ import com.agar.entities.Cell;
 import com.agar.entities.Food;
 
 import com.agar.factory.PlayerFactory;
+import com.agar.input.MouseHandler;
 
-/*
- * Panel principal del juego.
- *
- * Aquí dibujaremos:
- * - jugador
- * - comida
- * - posteriormente bots
- */
-public class GamePanel extends JPanel {
+public class GamePanel extends JPanel implements Runnable {
 
     public static final int WIDTH = 1200;
     public static final int HEIGHT = 800;
 
-    // Jugador principal
+    private Thread gameThread;
+
     private Cell player;
 
-    // Lista de comidas
     private List<Food> foods;
 
     public GamePanel() {
@@ -37,24 +30,22 @@ public class GamePanel extends JPanel {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Color.BLACK);
 
+        MouseHandler mouseHandler = new MouseHandler();
+        addMouseMotionListener(mouseHandler);
+
         initializeGame();
+
+        startGameThread();
     }
 
-    /*
-     * Inicializa los objetos del juego.
-     */
     private void initializeGame() {
 
-        // Factory Method
         PlayerFactory playerFactory = new PlayerFactory();
 
         player = playerFactory.create();
 
         foods = new ArrayList<>();
 
-        /*
-         * Generar 20 comidas
-         */
         for (int i = 0; i < 20; i++) {
 
             double x = Math.random() * WIDTH;
@@ -64,15 +55,41 @@ public class GamePanel extends JPanel {
         }
     }
 
+    private void startGameThread() {
+
+        gameThread = new Thread(this);
+        gameThread.start();
+    }
+
+    @Override
+    public void run() {
+
+        while (true) {
+
+            update();
+
+            repaint();
+
+            try {
+                Thread.sleep(16);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void update() {
+
+        player.update();
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
 
         super.paintComponent(g);
 
-        // Dibujar jugador
         player.draw(g);
 
-        // Dibujar comida
         for (Food food : foods) {
 
             food.draw(g);
