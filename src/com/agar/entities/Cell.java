@@ -91,4 +91,12 @@ public class Cell extends Entity {
     ) {
         this.movementStrategy = movementStrategy;
     }
+
+    /*
+    * Hace crecer la célula.
+    */
+    public void grow(int amount) {
+
+        radius += amount;
+    }
 }
