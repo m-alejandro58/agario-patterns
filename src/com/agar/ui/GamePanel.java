@@ -18,6 +18,8 @@ import com.agar.input.MouseHandler;
 
 import com.agar.facade.GameFacade;
 
+import com.agar.factory.BotFactory;
+
 public class GamePanel extends JPanel implements Runnable {
 
     public static final int WIDTH = 1200;
@@ -26,6 +28,8 @@ public class GamePanel extends JPanel implements Runnable {
     private Thread gameThread;
 
     private Cell player;
+
+    private List<Cell> bots;
 
     private List<Food> foods;
 
@@ -59,6 +63,14 @@ public class GamePanel extends JPanel implements Runnable {
 
         player = playerFactory.create();
 
+        BotFactory botFactory =
+                new BotFactory();
+
+        bots = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+
+            bots.add(botFactory.create());
+        }
         foods = new ArrayList<>();
 
         score = 0;
@@ -116,6 +128,11 @@ public class GamePanel extends JPanel implements Runnable {
 
         gameFacade.update();
 
+        for (Cell bot : bots) {
+
+            bot.update();
+        }
+
         score =
                 gameFacade.getScore();
 
@@ -129,6 +146,11 @@ public class GamePanel extends JPanel implements Runnable {
         super.paintComponent(g);
 
         player.draw(g);
+
+        for (Cell bot : bots) {
+
+            bot.draw(g);
+        }
 
         for (Food food : foods) {
 
