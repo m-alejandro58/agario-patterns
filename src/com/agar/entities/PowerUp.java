@@ -3,9 +3,6 @@ package com.agar.entities;
 import java.awt.Color;
 import java.awt.Graphics;
 
-/*
- * PowerUp de velocidad.
- */
 public class PowerUp extends Entity {
 
     public PowerUp(
@@ -31,6 +28,14 @@ public class PowerUp extends Entity {
                 (int)(y - radius),
                 radius * 2,
                 radius * 2
+        );
+
+        g.setColor(Color.BLACK);
+
+        g.drawString(
+                "S",
+                (int)x - 3,
+                (int)y + 4
         );
     }
 }

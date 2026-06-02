@@ -3,7 +3,7 @@ package com.agar.decorator;
 import com.agar.entities.Cell;
 
 /*
- * Aumenta temporalmente la velocidad.
+ * Duplica temporalmente la velocidad.
  */
 public class SpeedBoostDecorator extends CellDecorator {
 
@@ -15,8 +15,12 @@ public class SpeedBoostDecorator extends CellDecorator {
     @Override
     public void apply() {
 
-        cell.setSpeed(
-                cell.getSpeed() * 2
-        );
+        cell.setSpeedMultiplier(2.0);
+    }
+
+    @Override
+    public void remove() {
+
+        cell.setSpeedMultiplier(1.0);
     }
 }

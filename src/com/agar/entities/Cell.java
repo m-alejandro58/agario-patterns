@@ -14,13 +14,19 @@ public class Cell extends Entity {
 
     private String name;
     private Color color;
-    private double speed;
+
+    /*
+     * State controla esta velocidad.
+     */
+    private double baseSpeed;
+
+    /*
+     * Decorator modificará este multiplicador.
+     */
+    private double speedMultiplier;
 
     private MovementStrategy movementStrategy;
 
-    /*
-     * State Pattern
-     */
     private CellState state;
 
     public Cell(
@@ -36,8 +42,11 @@ public class Cell extends Entity {
         super(x, y, radius);
 
         this.name = name;
-        this.speed = speed;
         this.color = color;
+
+        this.baseSpeed = speed;
+        this.speedMultiplier = 1.0;
+
         this.movementStrategy = movementStrategy;
 
         this.state = new NormalState();
@@ -87,15 +96,15 @@ public class Cell extends Entity {
         g.setColor(Color.WHITE);
 
         g.drawString(
-            name,
-            (int) (x - radius),
-            (int) (y - radius - 5)
+                name,
+                (int) (x - radius),
+                (int) (y - radius - 5)
         );
 
         g.drawString(
-            state.getStateName(),
-            (int) (x - radius),
-            (int) (y - radius - 20)
+                state.getStateName(),
+                (int) (x - radius),
+                (int) (y - radius - 20)
         );
     }
 
@@ -108,21 +117,51 @@ public class Cell extends Entity {
         return name;
     }
 
+    /*
+     * Velocidad real usada por Strategy.
+     */
     public double getSpeed() {
-        return speed;
+
+        return baseSpeed * speedMultiplier;
     }
 
-    public void setSpeed(double speed) {
-        this.speed = speed;
+    /*
+     * State modifica esto.
+     */
+    public void setBaseSpeed(double baseSpeed) {
+
+        this.baseSpeed = baseSpeed;
+    }
+
+    public double getBaseSpeed() {
+
+        return baseSpeed;
+    }
+
+    /*
+     * Decorator modifica esto.
+     */
+    public void setSpeedMultiplier(
+            double speedMultiplier
+    ) {
+
+        this.speedMultiplier = speedMultiplier;
+    }
+
+    public double getSpeedMultiplier() {
+
+        return speedMultiplier;
     }
 
     public MovementStrategy getMovementStrategy() {
+
         return movementStrategy;
     }
 
     public void setMovementStrategy(
             MovementStrategy movementStrategy
     ) {
+
         this.movementStrategy = movementStrategy;
     }
 }

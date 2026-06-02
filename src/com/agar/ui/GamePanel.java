@@ -12,11 +12,14 @@ import java.util.List;
 
 import com.agar.entities.Cell;
 import com.agar.entities.Food;
+import com.agar.entities.PowerUp;
 
 import com.agar.factory.PlayerFactory;
 import com.agar.input.MouseHandler;
 
 import com.agar.services.CollisionService;
+
+import com.agar.decorator.SpeedBoostDecorator;
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -30,6 +33,10 @@ public class GamePanel extends JPanel implements Runnable {
     private List<Food> foods;
 
     private int score;
+
+    private PowerUp speedPowerUp;
+
+    private long speedBoostEndTime = 0;
 
     public GamePanel() {
 
@@ -66,6 +73,8 @@ public class GamePanel extends JPanel implements Runnable {
 
             foods.add(new Food(x, y));
         }
+
+        spawnSpeedPowerUp();
     }
 
     private void startGameThread() {
@@ -100,22 +109,27 @@ public class GamePanel extends JPanel implements Runnable {
         player.update();
 
         checkFoodCollisions();
+
+        checkPowerUpCollision();
+
+        updatePowerUps();
     }
 
-    /*
-     * Verifica si el jugador comió comida.
-     */
     private void checkFoodCollisions() {
 
         int foodsToSpawn = 0;
 
-        Iterator<Food> iterator = foods.iterator();
+        Iterator<Food> iterator =
+                foods.iterator();
 
         while (iterator.hasNext()) {
 
             Food food = iterator.next();
 
-            if (CollisionService.isColliding(player, food)) {
+            if (CollisionService.isColliding(
+                    player,
+                    food
+            )) {
 
                 iterator.remove();
 
@@ -127,16 +141,53 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-    // Agregar nuevas comidas después del recorrido
-    for (int i = 0; i < foodsToSpawn; i++) {
+        for (int i = 0; i < foodsToSpawn; i++) {
 
-        spawnFood();
+            spawnFood();
+        }
     }
-}
 
-    /*
-     * Genera una nueva comida.
-     */
+    private void checkPowerUpCollision() {
+
+        if (speedPowerUp == null) {
+            return;
+        }
+
+        if (CollisionService.isColliding(
+                player,
+                speedPowerUp
+        )) {
+
+            SpeedBoostDecorator boost =
+                    new SpeedBoostDecorator(player);
+
+            boost.apply();
+
+            speedBoostEndTime =
+                    System.currentTimeMillis()
+                    + 5000;
+
+            speedPowerUp = null;
+        }
+    }
+
+    private void updatePowerUps() {
+
+        if (speedBoostEndTime == 0) {
+            return;
+        }
+
+        if (System.currentTimeMillis()
+                >= speedBoostEndTime) {
+
+            player.setSpeedMultiplier(1.0);
+
+            speedBoostEndTime = 0;
+
+            spawnSpeedPowerUp();
+        }
+    }
+
     private void spawnFood() {
 
         double x = Math.random() * WIDTH;
@@ -146,6 +197,15 @@ public class GamePanel extends JPanel implements Runnable {
         foods.add(
                 new Food(x, y)
         );
+    }
+
+    private void spawnSpeedPowerUp() {
+
+        speedPowerUp =
+                new PowerUp(
+                        Math.random() * WIDTH,
+                        Math.random() * HEIGHT
+                );
     }
 
     @Override
@@ -160,12 +220,24 @@ public class GamePanel extends JPanel implements Runnable {
             food.draw(g);
         }
 
+        if (speedPowerUp != null) {
+
+            speedPowerUp.draw(g);
+        }
+
         g.setColor(Color.WHITE);
 
         g.drawString(
                 "Score: " + score,
                 20,
                 20
+        );
+
+        g.drawString(
+                "Speed x"
+                        + player.getSpeedMultiplier(),
+                20,
+                40
         );
     }
 }
