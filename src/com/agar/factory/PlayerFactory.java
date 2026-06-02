@@ -4,6 +4,7 @@ import java.awt.Color;
 
 import com.agar.builder.CellBuilder;
 import com.agar.entities.Cell;
+import com.agar.strategy.PlayerMovement;
 
 /*
  * Factory Method para crear jugadores.
@@ -22,6 +23,9 @@ public class PlayerFactory implements EntityFactory<Cell> {
                 .setRadius(25)
                 .setSpeed(4)
                 .setColor(Color.BLUE)
+                .setMovementStrategy(
+                        new PlayerMovement()
+                )
                 .build();
     }
 }

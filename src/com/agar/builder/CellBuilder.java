@@ -3,6 +3,7 @@ package com.agar.builder;
 import java.awt.Color;
 
 import com.agar.entities.Cell;
+import com.agar.strategy.MovementStrategy;
 
 /*
  * Builder encargado de construir objetos Cell
@@ -16,6 +17,8 @@ public class CellBuilder {
     private int radius;
     private double speed;
     private Color color;
+
+    private MovementStrategy movementStrategy;
 
     public CellBuilder setName(String name) {
         this.name = name;
@@ -47,9 +50,13 @@ public class CellBuilder {
         return this;
     }
 
-    /*
-     * Construye el objeto Cell final.
-     */
+    public CellBuilder setMovementStrategy(
+            MovementStrategy movementStrategy
+    ) {
+        this.movementStrategy = movementStrategy;
+        return this;
+    }
+
     public Cell build() {
 
         return new Cell(
@@ -58,7 +65,8 @@ public class CellBuilder {
                 y,
                 radius,
                 speed,
-                color
+                color,
+                movementStrategy
         );
     }
 }

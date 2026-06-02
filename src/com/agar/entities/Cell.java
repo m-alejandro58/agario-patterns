@@ -3,6 +3,8 @@ package com.agar.entities;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import com.agar.strategy.MovementStrategy;
+
 /*
  * Representa una célula.
  *
@@ -14,56 +16,48 @@ import java.awt.Graphics;
  */
 public class Cell extends Entity {
 
-    // Nombre de la célula
     private String name;
-
-    // Color con el que se dibuja
     private Color color;
-
-    // Velocidad de movimiento
     private double speed;
 
     /*
-     * Constructor completo.
+     * Strategy Pattern
+     *
+     * Define cómo se moverá la célula.
      */
+    private MovementStrategy movementStrategy;
+
     public Cell(
             String name,
             double x,
             double y,
             int radius,
             double speed,
-            Color color
+            Color color,
+            MovementStrategy movementStrategy
     ) {
 
-        // Constructor padre
         super(x, y, radius);
 
         this.name = name;
         this.speed = speed;
         this.color = color;
+        this.movementStrategy = movementStrategy;
     }
 
-    /*
-     * Más adelante aquí actualizaremos:
-     * - movimiento
-     * - colisiones
-     * - crecimiento
-     */
     @Override
     public void update() {
 
+        if (movementStrategy != null) {
+            movementStrategy.move(this);
+        }
     }
 
-    /*
-     * Dibuja la célula en pantalla.
-     */
     @Override
     public void draw(Graphics g) {
 
-        // Color de la célula
         g.setColor(color);
 
-        // Dibujar círculo
         g.fillOval(
                 (int) x,
                 (int) y,
@@ -71,7 +65,6 @@ public class Cell extends Entity {
                 radius * 2
         );
 
-        // Nombre encima de la célula
         g.setColor(Color.WHITE);
 
         g.drawString(
@@ -81,13 +74,21 @@ public class Cell extends Entity {
         );
     }
 
-    // Getters
-
     public String getName() {
         return name;
     }
 
     public double getSpeed() {
         return speed;
+    }
+
+    public MovementStrategy getMovementStrategy() {
+        return movementStrategy;
+    }
+
+    public void setMovementStrategy(
+            MovementStrategy movementStrategy
+    ) {
+        this.movementStrategy = movementStrategy;
     }
 }
