@@ -7,7 +7,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.agar.entities.Cell;
@@ -17,9 +16,7 @@ import com.agar.entities.PowerUp;
 import com.agar.factory.PlayerFactory;
 import com.agar.input.MouseHandler;
 
-import com.agar.services.CollisionService;
-
-import com.agar.decorator.SpeedBoostDecorator;
+import com.agar.facade.GameFacade;
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -36,7 +33,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     private PowerUp speedPowerUp;
 
-    private long speedBoostEndTime = 0;
+    private GameFacade gameFacade;
 
     public GamePanel() {
 
@@ -74,7 +71,18 @@ public class GamePanel extends JPanel implements Runnable {
             foods.add(new Food(x, y));
         }
 
-        spawnSpeedPowerUp();
+        speedPowerUp =
+                new PowerUp(
+                        Math.random() * WIDTH,
+                        Math.random() * HEIGHT
+                );
+
+        gameFacade =
+                new GameFacade(
+                        player,
+                        foods,
+                        speedPowerUp
+                );
     }
 
     private void startGameThread() {
@@ -106,106 +114,13 @@ public class GamePanel extends JPanel implements Runnable {
 
     private void update() {
 
-        player.update();
+        gameFacade.update();
 
-        checkFoodCollisions();
-
-        checkPowerUpCollision();
-
-        updatePowerUps();
-    }
-
-    private void checkFoodCollisions() {
-
-        int foodsToSpawn = 0;
-
-        Iterator<Food> iterator =
-                foods.iterator();
-
-        while (iterator.hasNext()) {
-
-            Food food = iterator.next();
-
-            if (CollisionService.isColliding(
-                    player,
-                    food
-            )) {
-
-                iterator.remove();
-
-                player.grow(1);
-
-                score++;
-
-                foodsToSpawn++;
-            }
-        }
-
-        for (int i = 0; i < foodsToSpawn; i++) {
-
-            spawnFood();
-        }
-    }
-
-    private void checkPowerUpCollision() {
-
-        if (speedPowerUp == null) {
-            return;
-        }
-
-        if (CollisionService.isColliding(
-                player,
-                speedPowerUp
-        )) {
-
-            SpeedBoostDecorator boost =
-                    new SpeedBoostDecorator(player);
-
-            boost.apply();
-
-            speedBoostEndTime =
-                    System.currentTimeMillis()
-                    + 5000;
-
-            speedPowerUp = null;
-        }
-    }
-
-    private void updatePowerUps() {
-
-        if (speedBoostEndTime == 0) {
-            return;
-        }
-
-        if (System.currentTimeMillis()
-                >= speedBoostEndTime) {
-
-            player.setSpeedMultiplier(1.0);
-
-            speedBoostEndTime = 0;
-
-            spawnSpeedPowerUp();
-        }
-    }
-
-    private void spawnFood() {
-
-        double x = Math.random() * WIDTH;
-
-        double y = Math.random() * HEIGHT;
-
-        foods.add(
-                new Food(x, y)
-        );
-    }
-
-    private void spawnSpeedPowerUp() {
+        score =
+                gameFacade.getScore();
 
         speedPowerUp =
-                new PowerUp(
-                        Math.random() * WIDTH,
-                        Math.random() * HEIGHT
-                );
+                gameFacade.getSpeedPowerUp();
     }
 
     @Override
