@@ -11,6 +11,8 @@ import java.util.List;
 import com.agar.entities.Cell;
 import com.agar.entities.Food;
 
+import com.agar.factory.PlayerFactory;
+
 /*
  * Panel principal del juego.
  *
@@ -43,18 +45,10 @@ public class GamePanel extends JPanel {
      */
     private void initializeGame() {
 
-        // Crear jugador
+        // Factory Method
+        PlayerFactory playerFactory = new PlayerFactory();
 
-        player = new Cell(
-                "Jugador",
-                500,
-                300,
-                25,
-                4,
-                Color.BLUE
-        );
-
-        // Crear lista de comida
+        player = playerFactory.create();
 
         foods = new ArrayList<>();
 
@@ -79,7 +73,6 @@ public class GamePanel extends JPanel {
         player.draw(g);
 
         // Dibujar comida
-
         for (Food food : foods) {
 
             food.draw(g);
