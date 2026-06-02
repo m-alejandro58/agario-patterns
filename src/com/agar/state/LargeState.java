@@ -7,7 +7,7 @@ public class LargeState implements CellState {
     @Override
     public void applyState(Cell cell) {
 
-        cell.setSpeed(3);
+        cell.setBaseSpeed(3);
     }
 
     @Override

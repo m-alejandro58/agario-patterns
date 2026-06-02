@@ -7,7 +7,7 @@ public class NormalState implements CellState {
     @Override
     public void applyState(Cell cell) {
 
-        cell.setSpeed(4);
+        cell.setBaseSpeed(4);
     }
 
     @Override

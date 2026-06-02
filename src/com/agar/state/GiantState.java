@@ -7,7 +7,7 @@ public class GiantState implements CellState {
     @Override
     public void applyState(Cell cell) {
 
-        cell.setSpeed(2);
+        cell.setBaseSpeed(2);
     }
 
     @Override
