@@ -13,13 +13,17 @@ public class CollisionService {
             Food food
     ) {
 
-        double dx = cell.getX() - food.getX();
-        double dy = cell.getY() - food.getY();
+        double dx =
+                cell.getX() - food.getX();
+
+        double dy =
+                cell.getY() - food.getY();
 
         double distance =
                 Math.sqrt(dx * dx + dy * dy);
 
-        return distance <
-                (cell.getRadius() + food.getRadius());
+        return distance <=
+                (cell.getRadius()
+                        + food.getRadius());
     }
 }

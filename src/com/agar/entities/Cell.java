@@ -5,27 +5,23 @@ import java.awt.Graphics;
 
 import com.agar.strategy.MovementStrategy;
 
-/*
- * Representa una célula.
- *
- * Puede ser:
- * - jugador
- * - bot
- *
- * Hereda de Entity.
- */
+import com.agar.state.CellState;
+import com.agar.state.NormalState;
+import com.agar.state.LargeState;
+import com.agar.state.GiantState;
+
 public class Cell extends Entity {
 
     private String name;
     private Color color;
     private double speed;
 
-    /*
-     * Strategy Pattern
-     *
-     * Define cómo se moverá la célula.
-     */
     private MovementStrategy movementStrategy;
+
+    /*
+     * State Pattern
+     */
+    private CellState state;
 
     public Cell(
             String name,
@@ -43,13 +39,36 @@ public class Cell extends Entity {
         this.speed = speed;
         this.color = color;
         this.movementStrategy = movementStrategy;
+
+        this.state = new NormalState();
     }
 
     @Override
     public void update() {
 
+        updateState();
+
+        state.applyState(this);
+
         if (movementStrategy != null) {
+
             movementStrategy.move(this);
+        }
+    }
+
+    private void updateState() {
+
+        if (radius >= 80) {
+
+            state = new GiantState();
+
+        } else if (radius >= 40) {
+
+            state = new LargeState();
+
+        } else {
+
+            state = new NormalState();
         }
     }
 
@@ -59,8 +78,8 @@ public class Cell extends Entity {
         g.setColor(color);
 
         g.fillOval(
-                (int) x,
-                (int) y,
+                (int) (x - radius),
+                (int) (y - radius),
                 radius * 2,
                 radius * 2
         );
@@ -68,10 +87,21 @@ public class Cell extends Entity {
         g.setColor(Color.WHITE);
 
         g.drawString(
-                name,
-                (int) x,
-                (int) y - 5
+            name,
+            (int) (x - radius),
+            (int) (y - radius - 5)
         );
+
+        g.drawString(
+            state.getStateName(),
+            (int) (x - radius),
+            (int) (y - radius - 20)
+        );
+    }
+
+    public void grow(int amount) {
+
+        radius += amount;
     }
 
     public String getName() {
@@ -82,6 +112,10 @@ public class Cell extends Entity {
         return speed;
     }
 
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
     public MovementStrategy getMovementStrategy() {
         return movementStrategy;
     }
@@ -90,13 +124,5 @@ public class Cell extends Entity {
             MovementStrategy movementStrategy
     ) {
         this.movementStrategy = movementStrategy;
-    }
-
-    /*
-    * Hace crecer la célula.
-    */
-    public void grow(int amount) {
-
-        radius += amount;
     }
 }
